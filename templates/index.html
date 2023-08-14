@@ -24,7 +24,7 @@
             .then(response => response.json())
             .then(data => {
                 var responseContainer = document.getElementById("response-container");
-                responseContainer.textContent = data.assistant_response;
+                responseContainer.textContent = data.chat_history[data.chat_history.length - 1].content;
             });
         }
     </script>
