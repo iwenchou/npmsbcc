@@ -18,10 +18,8 @@ def generate_response():
     investigation = request.json["investigation"]
 
     assistant_response = generate_openai_response(category, feedback, investigation)
-
-    return jsonify({"response": assistant_response})
     
-     # 將助理回應加入聊天歷史中
+    # 將助理回應加入聊天歷史中
     chat_history = [{"role": "system", "content": system_message}]
     user_message = f"觀眾意見類別：{category}\n觀眾意見內容：{feedback}\n業管單位調查：{investigation}\n"
     chat_history.append({"role": "user", "content": user_message})
@@ -41,9 +39,11 @@ def generate_openai_response(category, feedback, investigation):
         model="gpt-3.5-turbo",
         messages=chat_history,
         temperature=0.38,
-        max_tokens=500  # Adjust this value to control the response length
+        max_tokens=500  # 調整此值以控制回應的長度
     )
 
+    assistant_response = response.choices[0].message["content"]
+    return assistant_response
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
