@@ -21,10 +21,20 @@
                     investigation: investigation
                 })
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Network response was not ok");
+             }
+            return response.json();
+})
             .then(data => {
                 var responseContainer = document.getElementById("response-container");
                 responseContainer.textContent = data.chat_history[data.chat_history.length - 1].content;
+})
+                .catch(error => {
+                    console.log("There was a problem with the fetch operation:", error.message);
+});
+
             });
         }
     </script>
