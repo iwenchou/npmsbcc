@@ -29,7 +29,7 @@ def generate_openai_response(category, feedback, investigation):
     chat_history = [{"role": "system", "content": system_message}]
     chat_history.append({"role": "user", "content": user_message})
 
-    response = openai.ChatCompletion.create(
+    response = chat_completion = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=chat_history,
         temperature=0.38,
