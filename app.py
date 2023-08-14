@@ -44,7 +44,7 @@ def generate_openai_response(category, feedback, investigation):
         model="gpt-3.5-turbo",
         messages=chat_history,
         temperature=0.38,
-        max_tokens=500  # 調整此值以控制回應的長度
+        max_tokens=800  # 調整此值以控制回應的長度
     )
 
     assistant_response = response.choices[0].message["content"]
