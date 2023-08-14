@@ -7,6 +7,7 @@
             var category = document.getElementById("category").value;
             var feedback = document.getElementById("feedback").value;
             var investigation = document.getElementById("investigation").value;
+            
 
             // 發送 POST 請求到 generate_response 路由
             fetch("/generate_response", {
@@ -23,7 +24,7 @@
             .then(response => response.json())
             .then(data => {
                 var responseContainer = document.getElementById("response-container");
-                responseContainer.textContent = data.response;
+                responseContainer.textContent = assistant_response;
             });
         }
     </script>
