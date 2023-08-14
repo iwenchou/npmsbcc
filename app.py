@@ -5,7 +5,7 @@ import threading
 
 app = Flask(__name__)
 
-openai.api_key = os.environ.get("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")
+openai.api_key = os.environ.get("OPENAI_API_KEY")
 
 @app.route("/")
 def index():
@@ -30,6 +30,7 @@ def generate_response():
             return "This is a GET request response"
 
     except Exception as e:
+        app.logger.error("Error encountered: ", exc_info=True)
         return jsonify({"error": str(e)}), 500
 
 def generate_openai_response(category, feedback, investigation):
@@ -39,7 +40,7 @@ def generate_openai_response(category, feedback, investigation):
     chat_history = [{"role": "system", "content": system_message}]
     chat_history.append({"role": "user", "content": user_message})
 
-    response = chat_completion = openai.ChatCompletion.create(
+    response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=chat_history,
         temperature=0.38,
