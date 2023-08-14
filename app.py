@@ -17,13 +17,7 @@ def generate_response():
     feedback = request.json["feedback"]
     investigation = request.json["investigation"]
 
-    assistant_response = generate_openai_response(category, feedback, investigation)
-    
-    # 將助理回應加入聊天歷史中
-    chat_history = [{"role": "system", "content": system_message}]
-    user_message = f"觀眾意見類別：{category}\n觀眾意見內容：{feedback}\n業管單位調查：{investigation}\n"
-    chat_history.append({"role": "user", "content": user_message})
-    chat_history.append({"role": "assistant", "content": assistant_response})
+    assistant_response, chat_history = generate_openai_response(category, feedback, investigation)
 
     # 將整個聊天歷史轉換成 JSON 格式回傳給前端
     return jsonify({"chat_history": chat_history})
@@ -43,8 +37,10 @@ def generate_openai_response(category, feedback, investigation):
     )
 
     assistant_response = response.choices[0].message["content"]
-    return assistant_response
+    chat_history.append({"role": "assistant", "content": assistant_response})
 
+    return assistant_response, chat_history
+    
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
