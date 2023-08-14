@@ -1,72 +1,40 @@
-from flask import Flask, request, abort
-from linebot import LineBotApi, WebhookHandler
-from linebot.exceptions import InvalidSignatureError
-from linebot.models import MessageEvent, TextMessage, TextSendMessage
-import os
+from flask import Flask, render_template, request
 import openai
 
 app = Flask(__name__)
 
-# 設定 LineBot 的資訊
-line_bot_api = LineBotApi('iDjMaHRLHqMapczUxFZl4snKGjDQgHbfDj1e9HIGFTeHDruGq7ckV2d8fz7XA6fyZ0qAhB6xtSyeTj0yf6nepK+jcdY0G7YFoMWnQHfegMoXZfdSSehQPLAPrIbGItfMiZ4NePvoI0hjTWyhAEIiwwdB04t89/1O/w1cDnyilFU=')
-handler = WebhookHandler('e34a22c11a857de4dec2c631b43e59d2')
+openai.api_key = "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"
 
-# 設定您的 ChatGPT API 存取權杖
-openai.api_key = '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'
+@app.route("/")
+def index():
+    return render_template("index.html")
 
-def generate_official_response(feedback, initial_response):
-    prompt = f"觀眾反應：{feedback}\n業管單位的初步回應：{initial_response}\n正式回覆："
+@app.route("/generate_response", methods=["POST"])
+def generate_response():
+    category = request.form.get("category")
+    feedback = request.form.get("feedback")
+    investigation = request.form.get("investigation")
+
+    # 建立 ChatGPT 的 prompt
+    prompt = f"現在開始你將擔任國立故宮博物院南部院區（故宮南院）的資深博物館館員，除了要熟捻中國歷史與亞洲藝術史，文化人類學等相關研究領域，還有博物館學典藏、文物維護、展示、教育等相關專業知識，並了解故宮南院官方的回覆綱領，以溫柔堅定並且專業的口吻，表達1. 誠懇的致歉 2.說明理由或解決方案 3. 感謝觀眾諒解並期待觀眾再度來訪光臨。"
     
+    # 構建 ChatGPT 輸入
+    chatgpt_input = f"觀眾意見類別：{category}\n觀眾意見內容：{feedback}\n業管單位調查：{investigation}\n"
+    prompt += chatgpt_input
+    
+    # 使用 ChatGPT 生成回應
     response = openai.Completion.create(
-        model="text-davinci-003",  # 或其他您喜歡的模型
+        model="text-davinci-003",
         prompt=prompt,
-        max_tokens=150-300  # 您可以根據需要調整生成回覆的長度
+        max_tokens=350
     )
     
     official_response = response.choices[0].text.strip()
-    return official_response
+    return render_template("index.html", response=official_response)
 
-@handler.add(MessageEvent, message=TextMessage)
-def handle_message(event):
-    user_message = event.message.text
-    feedback = "一個國家級博物館，北邊等車排隊的地方用小石子鋪路，請問是沒有經費了嗎?!"
-    initial_response = "(1)現為碎石子鋪面之排隊動線處(3m*12m)，將更換為透水磚地坪。"
-    chatgpt_response = generate_chatgpt_response(feedback, initial_response)
-    reply_message = TextSendMessage(text=chatgpt_response)
-    line_bot_api.reply_message(event.reply_token, reply_message)
-
-def generate_chatgpt_response(feedback, initial_response):
-    prompt = f"觀眾反應：{feedback}\n業管單位的初步回應：{initial_response}\n正式回覆："
-    
-    response = openai.Completion.create(
-        engine="text-davinci-003",  # 或其他您喜歡的模型
-        prompt=prompt,
-        max_tokens=150  # 您可以根據需要調整生成回覆的長度
-    )
-    
-    official_response = response.choices[0].text.strip()
-    return official_response
-@app.route('/callback', methods=['POST'])
-def callback():
-    # 獲取 X-Line-Signature 進行驗證
-    signature = request.headers['X-Line-Signature']
-
-    # 取得請求的內容
-    body = request.get_data(as_text=True)
-    app.logger.info("Request body: " + body)
-
-    try:
-        handler.handle(body, signature)
-    except InvalidSignatureError:
-        abort(400)
-
-    return 'OK'
-
-@app.route('/')
-def hello():
-    return "Hello, this is your Flask server!"
+if __name__ == "__main__":
+    app.run()
 
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+    app.run()
