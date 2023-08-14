@@ -24,7 +24,7 @@
             .then(response => response.json())
             .then(data => {
                 var responseContainer = document.getElementById("response-container");
-                responseContainer.textContent = data.response;
+                responseContainer.textContent = data.assistant_response;
             });
         }
     </script>
