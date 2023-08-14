@@ -33,5 +33,5 @@ def generate_response():
     return render_template("index.html", response=official_response)
 
 if __name__ == "__main__":
-    app.run()
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
 
