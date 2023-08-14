@@ -56,12 +56,6 @@ def hello():
     return "Hello, this is your Flask server!"
 
 
-@handler.add(MessageEvent, message=TextMessage)
-def handle_message(event):
-    # 回覆一個固定的文字訊息
-    reply_message = TextSendMessage(text="您好，請輸入觀眾意見內容！")
-    line_bot_api.reply_message(event.reply_token, reply_message)
-
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
