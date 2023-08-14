@@ -10,33 +10,31 @@
             
 
             // 發送 POST 請求到 generate_response 路由
-            fetch("/generate_response", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    category: category,
-                    feedback: feedback,
-                    investigation: investigation
-                })
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("Network response was not ok");
-             }
-            return response.json();
+fetch("/generate_response", {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json"  // 修改为 application/json
+    },
+    body: JSON.stringify({
+        category: category,
+        feedback: feedback,
+        investigation: investigation
+    })
 })
-            .then(data => {
-                var responseContainer = document.getElementById("response-container");
-                responseContainer.textContent = data.chat_history[data.chat_history.length - 1].content;
+.then(response => {
+    if (!response.ok) {
+        throw new Error("Network response was not ok");
+    }
+    return response.json();
 })
-                .catch(error => {
-                    console.log("There was a problem with the fetch operation:", error.message);
+.then(data => {
+    var responseContainer = document.getElementById("response-container");
+    responseContainer.textContent = data.chat_history[data.chat_history.length - 1].content;
+})
+.catch(error => {
+    console.log("There was a problem with the fetch operation:", error.message);
 });
 
-            });
-        }
     </script>
 </head>
 <body>
