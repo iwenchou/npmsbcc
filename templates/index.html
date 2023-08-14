@@ -2,6 +2,31 @@
 <html>
 <head>
     <title>故宮南院智慧客服</title>
+    <script>
+        function generateResponse() {
+            var category = document.getElementById("category").value;
+            var feedback = document.getElementById("feedback").value;
+            var investigation = document.getElementById("investigation").value;
+
+            // 發送 POST 請求到 generate_response 路由
+            fetch("/generate_response", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    category: category,
+                    feedback: feedback,
+                    investigation: investigation
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                var responseContainer = document.getElementById("response-container");
+                responseContainer.textContent = data.response;
+            });
+        }
+    </script>
 </head>
 <body>
     <h1>故宮南院智慧客服</h1>
@@ -16,7 +41,8 @@
         <textarea name="feedback" id="feedback" rows="4" cols="50"></textarea><br><br>
         <label for="investigation">請輸入業管單位調查結果：</label><br>
         <textarea name="investigation" id="investigation" rows="4" cols="50"></textarea><br><br>
-        <input type="submit" value="生成回應">
+        <input type="submit" value="生成回應" onclick="generateResponse(); return false;">
     </form>
+    <div id="response-container"></div>
 </body>
 </html>
