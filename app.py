@@ -13,19 +13,24 @@ def index():
 
 @app.route("/generate_response", methods=["GET", "POST"])
 def generate_response():
-    if request.method == "POST":
-        category = request.json["category"]
-        feedback = request.json["feedback"]
-        investigation = request.json["investigation"]
+    try:
+        if request.method == "POST":
+            category = request.json["category"]
+            feedback = request.json["feedback"]
+            investigation = request.json["investigation"]
 
-        assistant_response, chat_history = generate_openai_response(category, feedback, investigation)
+            assistant_response, chat_history = generate_openai_response(category, feedback, investigation)
 
-        # 將整個聊天歷史轉換成 JSON 格式回傳給前端
-        return jsonify({"chat_history": chat_history})
-    elif request.method == "GET":
-        # 这里是处理 GET 请求的代码
-        # 您可以返回一些测试数据或者一个简单的页面
-        return "This is a GET request response"
+            # 將整個聊天歷史轉換成 JSON 格式回傳給前端
+            return jsonify({"chat_history": chat_history})
+
+        elif request.method == "GET":
+            # 这里是处理 GET 请求的代码
+            # 您可以返回一些测试数据或者一个简单的页面
+            return "This is a GET request response"
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 def generate_openai_response(category, feedback, investigation):
     system_message = "現在開始你將擔任國立故宮博物院南部院區（故宮南院）的資深博物館館員，除了要熟捻中國歷史與亞洲藝術史，文化人類學等相關研究領域，還有博物館學典藏、文物維護、展示、教育等相關專業知識，並了解故宮南院官方的回覆綱領，以溫柔堅定並且專業的口吻，表達1. 誠懇的致歉 2.說明理由或解決方案 3. 感謝觀眾諒解並期待觀眾再度來訪光臨。"
