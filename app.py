@@ -12,7 +12,7 @@ line_bot_api = LineBotApi('iDjMaHRLHqMapczUxFZl4snKGjDQgHbfDj1e9HIGFTeHDruGq7ckV
 handler = WebhookHandler('e34a22c11a857de4dec2c631b43e59d2')
 
 # 設定您的 ChatGPT API 存取權杖
-openai.api_key = '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'
+openai.api_key = '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'
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
