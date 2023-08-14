@@ -6,6 +6,16 @@ app = Flask(__name__)
 
 openai.api_key = "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"
 
+openai.ChatCompletion.create(
+  model="gpt-3.5-turbo",
+  messages=[
+        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "user", "content": "Who won the world series in 2020?"},
+        {"role": "assistant", "content": "The Los Angeles Dodgers won the World Series in 2020."},
+        {"role": "user", "content": "Where was it played?"}
+    ]
+)
+
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -40,6 +50,7 @@ def generate_response():
         prompt=prompt,
         max_tokens=350
     )
+
     
     official_response = response.choices[0].text.strip()
     return render_template("index.html", response=official_response)
