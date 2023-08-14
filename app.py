@@ -5,7 +5,7 @@ import threading
 
 app = Flask(__name__)
 
-openai.api_key = "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"
+openai.api_key = os.environ.get("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")
 
 @app.route("/")
 def index():
