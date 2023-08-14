@@ -3,12 +3,37 @@ from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import MessageEvent, TextMessage, TextSendMessage
 import os
+import openai
 
 app = Flask(__name__)
 
 # 設定 LineBot 的資訊
 line_bot_api = LineBotApi('iDjMaHRLHqMapczUxFZl4snKGjDQgHbfDj1e9HIGFTeHDruGq7ckV2d8fz7XA6fyZ0qAhB6xtSyeTj0yf6nepK+jcdY0G7YFoMWnQHfegMoXZfdSSehQPLAPrIbGItfMiZ4NePvoI0hjTWyhAEIiwwdB04t89/1O/w1cDnyilFU=')
 handler = WebhookHandler('e34a22c11a857de4dec2c631b43e59d2')
+
+# 設定您的 ChatGPT API 存取權杖
+openai.api_key = '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'
+
+@handler.add(MessageEvent, message=TextMessage)
+def handle_message(event):
+    # 從使用者取得訊息內容
+    user_message = event.message.text
+
+    # 使用 ChatGPT 生成回覆
+    chatgpt_response = generate_chatgpt_response(user_message)
+
+    # 回覆 ChatGPT 生成的訊息
+    reply_message = TextSendMessage(text=chatgpt_response)
+    line_bot_api.reply_message(event.reply_token, reply_message)
+
+def generate_chatgpt_response(input_text):
+    # 調用 ChatGPT API 生成回覆
+    response = openai.Completion.create(
+        engine="davinci",  # 選擇適合的引擎
+        prompt=input_text,
+        max_tokens=50  # 控制回覆長度
+    )
+    return response.choices[0].text.strip()
 
 @app.route('/callback', methods=['POST'])
 def callback():
