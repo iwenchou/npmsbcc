@@ -110,6 +110,7 @@
             let style = document.getElementById("style").value;
             let other = document.getElementById("other").value;
             document.getElementById("additional_prompt").value = wordCount + ", " + style + ", " + other;
+            
             let formData = {
                  "category-input": document.getElementById('category-input').value,
                  "feedback": document.getElementById('feedback').value,
@@ -124,9 +125,11 @@
                 type: "POST",
                 url: "/generate_response",
                 data: JSON.stringify(formData),
+                contentType: "application/json",
+                dataType: "json",
                 success: function (response) {
                     // Update the response container with the server's response
-                    $('#response-container').html(response);
+                    $('#response-container').html(response.assistant_response);
                     // Reset the progress bar
                     $('.progress-bar').css('width', '100%').attr('aria-valuenow', 100).text('100%');
                 },
