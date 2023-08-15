@@ -110,12 +110,21 @@
             let style = document.getElementById("style").value;
             let other = document.getElementById("other").value;
             document.getElementById("additional_prompt").value = wordCount + ", " + style + ", " + other;
+             let formData = {
+                 "category-input": document.getElementById('category-input').value,
+                 "feedback": document.getElementById('feedback').value,
+                 "investigation": document.getElementById('investigation').value,
+                 "word_count": document.getElementById('word_count').value,
+                 "style": document.getElementById('style').value,
+                 "additional_prompt": document.getElementById('additional_prompt').value
+             };
 
             // Send AJAX request
             $.ajax({
                 type: "POST",
                 url: "/generate_response",
-                data: $(this).serialize(),
+                data: JSON.stringify(formData),
+                data: JSON.stringify(formData),
                 success: function (response) {
                     // Update the response container with the server's response
                     $('#response-container').html(response);
