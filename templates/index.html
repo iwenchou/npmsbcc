@@ -1,85 +1,68 @@
 <!DOCTYPE html>
 <html>
-
 <head>
     <title>故宮南院觀眾意見回復小幫手</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <style>
-        body,
-        html,
-        .form-control,
-        .btn,
-        select,
-        textarea,
-        .progress {
-            background-color: #000 !important;
+        body {
+            background-color: #000;
             color: #fff;
         }
-
-        textarea,
-        select,
-        button,
-        input[type="submit"],
-        .form-control {
-            background-color: #333 !important;
+        
+        textarea, select, button {
+            background-color: #333;
             color: #fff;
             border: 1px solid #555;
         }
-
+        
         .progress-bar {
-            background-color: #808080 !important;
+            background-color: #808080;
         }
 
         textarea {
-            width: 100%;
-            box-sizing: border-box;
+        width: 100%;
+        box-sizing: border-box;
         }
+        
+</style>
 
-        .selected {
-            background-color: #555 !important;
-        }
-    </style>
 </head>
-
+    
 <body>
     <h1>故宮南院觀眾意見回復小幫手</h1>
-    <form id="feedbackForm">
+    <form method="POST" action="/generate_response" onsubmit="return generateResponse();">
 
-        <label for="category">請先選擇意見類別：</label>
-        <div id="category">
-            <button type="button" class="category-btn" data-value="設施">設施</button>
-            <button type="button" class="category-btn" data-value="展覽">展覽</button>
-            <button type="button" class="category-btn" data-value="服務">服務</button>
-        </div>
-
-        <input type="hidden" name="category" id="category-input"><br><br>
-
+        <label for="category">請先選擇觀眾意見類別：</label>
+        <select name="category" id="category">
+            <option value="設施">設施</option>
+            <option value="展覽">展覽</option>
+            <option value="服務">服務</option>
+        </select><br><br>
         <label for="feedback">請輸入觀眾意見內容：</label><br>
         <textarea name="feedback" id="feedback" rows="4" cols="50"></textarea><br><br>
         <label for="investigation">請輸入業管單位調查結果（可以留空）：</label><br>
         <textarea name="investigation" id="investigation" rows="4" cols="50"></textarea><br><br>
-
+        <label for="additional_prompt">請輸入特殊要求或備註事項（可以留空）：</label><br>
+        <textarea name="additional_prompt" id="additional_prompt" rows="4" cols="50"></textarea><br><br>
         <label for="word_count">字數:</label>
-        <select id="word_count" name="word_count">
+        <select id="word_count" name="word_count"> 
             <option value="50">50字以內</option>
             <option value="150">150字以內</option>
             <option value="unlimited" selected>不限（預設）</option>
-        </select><br><br>
-
+        </select>
+        
         <label for="style">風格:</label>
         <select id="style" name="style">
             <option value="general">一般觀眾意見回復</option>
             <option value="social_media">社群媒體使用</option>
-        </select><br><br>
+        </select>
+        
+        <label for="additional_prompt">其他:</label>
+        <textarea id="additional_prompt" name="additional_prompt"></textarea>
 
-        <label for="other">其他:</label>
-        <textarea id="other" name="other"></textarea><br><br>
-
-        <!-- Hidden input to store the combined value of word_count, style, and other -->
-        <input type="hidden" id="additional_prompt" name="additional_prompt">
-
-          <input type="submit" value="辛苦了！請按我生成回應">
+        <input type="submit" value="辛苦了！請按我生成回應">
     </form>
     <div class="progress" style="height: 30px;">
         <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
@@ -90,59 +73,82 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
-        // 為每個類別按鈕添加點擊事件
-        document.querySelectorAll('.category-btn').forEach(btn => {
-            btn.addEventListener('click', function () {
-                // 移除所有按鈕的 selected 類
-                document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('selected'));
-                // 為被點擊的按鈕添加 selected 類
-                this.classList.add('selected');
-                // 更新隱藏的 input 欄位的值
-                document.getElementById('category-input').value = this.getAttribute('data-value');
-            });
-        });
+        function generateResponse() {
+            event.preventDefault();
 
-        $('#feedbackForm').submit(function (e) {
-            e.preventDefault();
+            updateProgressBar(); // 啟動進度條
 
-            // Combine the values of word_count, style, and other into the additional_prompt hidden input
-            let wordCount = document.getElementById("word_count").value;
-            let style = document.getElementById("style").value;
-            let other = document.getElementById("other").value;
-            document.getElementById("additional_prompt").value = wordCount + ", " + style + ", " + other;
-            
-            let formData = {
-                 "category-input": document.getElementById('category-input').value,
-                 "feedback": document.getElementById('feedback').value,
-                 "investigation": document.getElementById('investigation').value,
-                 "word_count": document.getElementById('word_count').value,
-                 "style": document.getElementById('style').value,
-                 "additional_prompt": document.getElementById('additional_prompt').value
-             };
+            var category = document.getElementById("category").value;
+            var feedback = document.getElementById("feedback").value;
+            var investigation = document.getElementById("investigation").value;
+            var additionalPrompt = document.getElementById("additional_prompt").value;
 
-            // Send AJAX request
-            $.ajax({
-                type: "POST",
-                url: "/generate_response",
-                data: JSON.stringify(formData),
-                contentType: "application/json",
-                dataType: "json",
-                success: function (response) {
-                    // Update the response container with the server's response
-                    $('#response-container').html(response.assistant_response);
-                    // Reset the progress bar
-                    $('.progress-bar').css('width', '100%').attr('aria-valuenow', 100).text('100%');
-                },
-                error: function (error) {
-                    // Handle any errors here
-                    console.error("Error:", error);
-                },
-                beforeSend: function () {
-                    // Update the progress bar to show that the request is in progress
-                    $('.progress-bar').css('width', '50%').attr('aria-valuenow', 50).text('50%');
+            // 發送 POST 請求到 generate_response 路由
+            fetch("/generate_response", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        category: category,
+                        feedback: feedback,
+                        investigation: investigation,
+                        additional_prompt: additionalPrompt
+                    })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Network response was not ok");
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    var responseContainer = document.getElementById("response-container");
+                    responseContainer.textContent = data.chat_history[data.chat_history.length - 1].content;
+                    clearInterval(interval); // 停止進度條更新
+
+                     // 停止進度條更新並設定為100%
+                    clearInterval(interval);
+                    let progressBar = $(".progress-bar");
+                    progressBar.css("width", "100%");
+                    progressBar.text("100%");
+                    
+                    // 新增「下一個案件」按鈕
+                    var nextButton = document.createElement("button");
+                    nextButton.textContent = "下一個案件";
+                    nextButton.onclick = resetForm;
+                    responseContainer.appendChild(nextButton);
+                })
+                .catch(error => {
+                    console.log("There was a problem with the fetch operation:", error.message);
+                    alert("很抱歉，目前無法生成回應。請稍後再試。");
+                });
+
+            return false;
+        }
+
+        function updateProgressBar() {
+            let progressBar = $(".progress-bar");
+            let width = 0;
+            interval = setInterval(function() { // 注意：這裡我們移除了 let，使 interval 成為全局變量
+                width += 5;
+                progressBar.css("width", width + "%");
+                progressBar.text(width + "%");
+
+                if (width >= 100) {
+                    clearInterval(interval);
                 }
-            });
-        });
+            }, 750); // 每750毫秒更新一次
+        }
+
+        function resetForm() {
+            document.getElementById("feedback").value = "";
+            document.getElementById("investigation").value = "";
+            document.getElementById("response-container").textContent = "";
+            let progressBar = $(".progress-bar");
+            progressBar.css("width", "0%");
+            progressBar.text("0%");
+}
     </script>
 </body>
 
