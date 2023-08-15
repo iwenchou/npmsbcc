@@ -19,8 +19,8 @@ def generate_response():
                 return jsonify({"error": "Invalid JSON provided"}), 400
                 
             category = request.json.get("category-input","設施")
-            feedback = request.json("feedback")
-            investigation = request.json("investigation")
+            feedback = request.json.get("feedback")
+            investigation = request.json.get("investigation")
             word_count = request.json.get('word_count', '不限（預設）')
             style = request.json.get('style', '一般觀眾意見回復')
             additional_prompt = request.json.get('additional_prompt', '')
