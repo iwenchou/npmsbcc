@@ -19,6 +19,10 @@ def generate_response():
             feedback = request.json["feedback"]
             investigation = request.json["investigation"]
 
+            word_count = request.json.get('word_count', '不限（預設）')
+            style = request.json.get('style', '一般觀眾意見回復')
+            additional_prompt = request.json.get('additional_prompt', '')
+
             assistant_response, chat_history = generate_openai_response(category, feedback, investigation)
 
             # 將整個聊天歷史轉換成 JSON 格式回傳給前端
@@ -33,9 +37,25 @@ def generate_response():
         app.logger.error("Error encountered: ", exc_info=True)
         return jsonify({"error": str(e)}), 500
 
-def generate_openai_response(category, feedback, investigation):
+def generate_openai_response(category, feedback, investigation, word_count, style, additional_prompt):
     system_message = generate_system_prompt_by_category(category)
-    built_in_prompt = "///以上是本次要處理的案件內容，請仔細閱讀「觀眾意見內容」接著參考「業管單位調查」，再遵循先前我所提供的提示、原則與範例作出正式回覆，並確保回覆字數不超過350個繁體中文字。" 
+
+# 根據前端的選擇生成相應的提示
+    word_count_prompt = ""
+    if word_count == "50":
+        word_count_prompt = "請以繁體中文回覆，長度請勿超過50字"
+    elif word_count == "150":
+        word_count_prompt = "請以繁體中文回覆，長度請勿超過50字"
+    else:
+        word_count_prompt = "回覆字數請不要超過350個繁體中文字"
+
+    style_prompt = ""
+    if style == "社群媒體使用":
+        style_prompt = "///請使用適合社群媒體，較為親切友善的風格回應，並斟酌使用少許表情符號。///"
+    elif style == "一般觀眾意見回復":
+        style_prompt = "///請仔細閱讀「觀眾意見內容」，接著參考「業管單位調查」提供的資訊，再遵循先前我所提供的提示、原則與範例作出正式回覆。///"
+    
+    built_in_prompt = f"以上是本次要處理的新案件內容。\\n{word_count_prompt}\\n{style_prompt}\\n其他：{additional_prompt}\\"
     additional_prompt = request.json.get('additional_prompt', '')
     user_message = f"觀眾意見類別：{category}\\n觀眾意見內容：{feedback}\\n業管單位調查：{investigation}\\n{built_in_prompt}\\n{additional_prompt}"
     chat_history = [{"role": "system", "content": system_message}]
