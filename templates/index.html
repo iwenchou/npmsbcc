@@ -3,8 +3,6 @@
 <head>
     <title>故宮南院觀眾意見回復小幫手</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
     <style>
        body, html, .form-control, .btn, select, textarea, .progress {
@@ -37,8 +35,8 @@
     <h1>故宮南院觀眾意見回復小幫手</h1>
     <form method="POST" action="/generate_response" onsubmit="return generateResponse();">
 
-<label for="category">請先選擇觀眾意見類別：</label>
-        <div id="category">
+<label for="additional_notes">其他:</label>
+<textarea id="additional_notes" name="additional_notes"></textarea>
             <button type="button" class="category-btn" data-value="設施">設施</button>
             <button type="button" class="category-btn" data-value="展覽">展覽</button>
             <button type="button" class="category-btn" data-value="服務">服務</button>
@@ -97,10 +95,21 @@
 
             updateProgressBar(); // 啟動進度條
 
-            vvar category = document.getElementById("category-input").value;
+            var category = document.getElementById("category-input").value;
             var feedback = document.getElementById("feedback").value;
             var investigation = document.getElementById("investigation").value;
             var additionalPrompt = document.getElementById("additional_prompt").value;
+
+            // 要發送的請求數據
+            var requestData = {
+                category: category,
+                feedback: feedback,
+                investigation: investigation,
+                additional_prompt: additionalPrompt
+            };
+
+    // 打印出要發送的請求數據
+            console.log("Sending request data:", requestData);
 
             // 發送 POST 請求到 generate_response 路由
             fetch("/generate_response", {
@@ -108,12 +117,7 @@
                     headers: {
                         "Content-Type": "application/json"
                     },
-                    body: JSON.stringify({
-                        category: category,
-                        feedback: feedback,
-                        investigation: investigation,
-                        additional_prompt: additionalPrompt
-                    })
+                body: JSON.stringify(requestData)
                 })
                 .then(response => {
                     if (!response.ok) {
