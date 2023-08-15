@@ -56,9 +56,9 @@ def generate_openai_response(category, feedback, investigation, word_count, styl
         style_prompt = "///請使用適合社群媒體，較為親切友善的風格回應，並斟酌使用少許表情符號。///"
     elif style == "一般觀眾意見回復":
         style_prompt = "///請仔細閱讀「觀眾意見內容」，接著參考「業管單位調查」提供的資訊，再遵循先前我所提供的提示、原則與範例作出正式回覆。///"
-    
-    built_in_prompt = f"以上是本次要處理的新案件內容。\\n{word_count_prompt}\\n{style_prompt}\\n其他：{additional_prompt}\\"
+
     additional_prompt = request.json.get('additional_prompt', '')
+    built_in_prompt = f"以上是本次要處理的新案件內容。\\n{word_count_prompt}\\n{style_prompt}\\n其他：{additional_prompt}\\"
     user_message = f"觀眾意見類別：{category}\\n觀眾意見內容：{feedback}\\n業管單位調查：{investigation}\\n{built_in_prompt}\\n{additional_prompt}"
     chat_history = [{"role": "system", "content": system_message}]
     chat_history.append({"role": "user", "content": user_message})
