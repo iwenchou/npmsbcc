@@ -15,7 +15,10 @@ def index():
 def generate_response():
     try:
         if request.method == "POST":
-            category = request.json["category"]
+            if not request.is_json:
+                return jsonify({"error": "Invalid JSON provided"}), 400
+                
+            category = request.json["category-input","設施"]
             feedback = request.json["feedback"]
             investigation = request.json["investigation"]
             word_count = request.json.get('word_count', '不限（預設）')
