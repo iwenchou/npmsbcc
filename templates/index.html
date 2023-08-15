@@ -1,47 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>故宮南院智慧客服</title>
-    <script>
-function generateResponse() {
-    event.preventDefault();
-
-    var category = document.getElementById("category").value;
-    var feedback = document.getElementById("feedback").value;
-    var investigation = document.getElementById("investigation").value;
-
-    // 發送 POST 請求到 generate_response 路由
-    fetch("/generate_response", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            category: category,
-            feedback: feedback,
-            investigation: investigation
-        })
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error("Network response was not ok");
-        }
-        return response.json();
-    })
-    .then(data => {
-        var responseContainer = document.getElementById("response-container");
-        responseContainer.textContent = data.chat_history[data.chat_history.length - 1].content;
-    })
-    .catch(error => {
-        console.log("There was a problem with the fetch operation:", error.message);
-    });
-    
-    return false;
-}
-    </script>
+    <title>故宮南院觀眾意見回復小幫手</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </head>
+    
 <body>
-    <h1>故宮南院智慧客服</h1>
+    <h1>故宮南院觀眾意見回復小幫手</h1>
     <form method="POST" action="/generate_response" onsubmit="return generateResponse();">
 
         <label for="category">請選擇觀眾意見類別：</label>
@@ -54,8 +21,71 @@ function generateResponse() {
         <textarea name="feedback" id="feedback" rows="4" cols="50"></textarea><br><br>
         <label for="investigation">請輸入業管單位調查結果：</label><br>
         <textarea name="investigation" id="investigation" rows="4" cols="50"></textarea><br><br>
-        <input type="submit" value="生成回應" onclick="generateResponse(); return false;">
+        <input type="submit" value="生成回應">
     </form>
+    <div class="progress" style="height: 30px;">
+        <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+    </div>
+
     <div id="response-container"></div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        function generateResponse() {
+            event.preventDefault();
+
+            updateProgressBar(); // 啟動進度條
+
+            var category = document.getElementById("category").value;
+            var feedback = document.getElementById("feedback").value;
+            var investigation = document.getElementById("investigation").value;
+
+            // 發送 POST 請求到 generate_response 路由
+            fetch("/generate_response", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        category: category,
+                        feedback: feedback,
+                        investigation: investigation
+                    })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Network response was not ok");
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    var responseContainer = document.getElementById("response-container");
+                    responseContainer.textContent = data.chat_history[data.chat_history.length - 1].content;
+                    clearInterval(interval); // 停止進度條更新
+                })
+                .catch(error => {
+                    console.log("There was a problem with the fetch operation:", error.message);
+                    alert("很抱歉，目前無法生成回應。請稍後再試。");
+                });
+
+            return false;
+        }
+
+        function updateProgressBar() {
+            let progressBar = $(".progress-bar");
+            let width = 0;
+            interval = setInterval(function() { // 注意：這裡我們移除了 let，使 interval 成為全局變量
+                width += 5;
+                progressBar.css("width", width + "%");
+                progressBar.text(width + "%");
+
+                if (width >= 100) {
+                    clearInterval(interval);
+                }
+            }, 750); // 每750毫秒更新一次
+        }
+    </script>
 </body>
+
 </html>
