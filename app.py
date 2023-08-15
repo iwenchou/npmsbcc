@@ -18,13 +18,14 @@ def generate_response():
             if not request.is_json:
                 return jsonify({"error": "Invalid JSON provided"}), 400
                 
-            category = request.json["category-input","設施"]
-            feedback = request.json["feedback"]
-            investigation = request.json["investigation"]
+            category = request.json.get("category-input","設施")
+            feedback = request.json("feedback")
+            investigation = request.json("investigation")
             word_count = request.json.get('word_count', '不限（預設）')
             style = request.json.get('style', '一般觀眾意見回復')
+            additional_prompt = request.json.get('additional_prompt', '')
 
-            assistant_response, chat_history = generate_openai_response(category, feedback, investigation, word_count, style, additional_prompt) 
+            assistant_response, chat_history = generate_openai_response(category, feedback, investigation, word_count, style, additional_prompt)
 
             # 將整個聊天歷史轉換成 JSON 格式回傳給前端
             return jsonify({"chat_history": chat_history})
