@@ -34,7 +34,7 @@
     <h1>故宮南院觀眾意見回復小幫手</h1>
     <form method="POST" action="/generate_response" onsubmit="return generateResponse();">
 
-        <label for="category">請選擇觀眾意見類別：</label>
+        <label for="category">請先選擇觀眾意見類別：</label>
         <select name="category" id="category">
             <option value="設施">設施</option>
             <option value="展覽">展覽</option>
@@ -46,6 +46,22 @@
         <textarea name="investigation" id="investigation" rows="4" cols="50"></textarea><br><br>
         <label for="additional_prompt">請輸入特殊要求或備註事項（可以留空）：</label><br>
         <textarea name="additional_prompt" id="additional_prompt" rows="4" cols="50"></textarea><br><br>
+        <label for="word_count">字數:</label>
+        <select id="word_count" name="word_count"> 
+            <option value="50">50字以內</option>
+            <option value="150">150字以內</option>
+            <option value="unlimited" selected>不限（預設）</option>
+        </select>
+        
+        <label for="style">風格:</label>
+        <select id="style" name="style">
+            <option value="general">一般觀眾意見回復</option>
+            <option value="social_media">社群媒體使用</option>
+        </select>
+        
+        <label for="additional_prompt">其他:</label>
+        <textarea id="additional_prompt" name="additional_prompt"></textarea>
+
         <input type="submit" value="辛苦了！請按我生成回應">
     </form>
     <div class="progress" style="height: 30px;">
