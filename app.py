@@ -36,7 +36,8 @@ def generate_response():
 def generate_openai_response(category, feedback, investigation):
     system_message = generate_system_prompt_by_category(category)
     built_in_prompt = "///以上是本次要處理的案件內容，請仔細閱讀「觀眾意見內容」接著參考「業管單位調查」，再遵循先前我所提供的提示、原則與範例作出正式回覆，並確保回覆字數不超過350個繁體中文字。" 
-    user_message = f"觀眾意見類別：{category}\\n觀眾意見內容：{feedback}\\n業管單位調查：{investigation}\\n{built_in_prompt}" 
+    additional_prompt = request.json.get('additional_prompt', '')
+    user_message = f"觀眾意見類別：{category}\\n觀眾意見內容：{feedback}\\n業管單位調查：{investigation}\\n{built_in_prompt}\\n{additional_prompt}"
     chat_history = [{"role": "system", "content": system_message}]
     chat_history.append({"role": "user", "content": user_message})
 
