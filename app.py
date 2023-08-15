@@ -18,7 +18,6 @@ def generate_response():
             category = request.json["category"]
             feedback = request.json["feedback"]
             investigation = request.json["investigation"]
-
             word_count = request.json.get('word_count', '不限（預設）')
             style = request.json.get('style', '一般觀眾意見回復')
             additional_prompt = request.json.get('additional_prompt', '')
