@@ -168,6 +168,13 @@
             progressBar.css("width", "0%");
             progressBar.text("0%");
 }
+         // 當文檔加載完成時
+    document.addEventListener("DOMContentLoaded", function() {
+        // 如果 category-input 欄位沒有值，則設置預設值
+        if (!document.getElementById('category-input').value) {
+            document.getElementById('category-input').value = "設施";
+        }
+    });
     </script>
 </body>
 
