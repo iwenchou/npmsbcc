@@ -6,12 +6,15 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <style>
+    <style>
         body {
             background-color: #000;
             color: #fff;
         }
         
-        textarea, select, button {
+        textarea, 
+        select, 
+        button {
             background-color: #333;
             color: #fff;
             border: 1px solid #555;
@@ -25,21 +28,25 @@
         width: 100%;
         box-sizing: border-box;
         }
-        
-</style>
 
+        .selected {
+            background-color: #555;
+        }    
+    </style>
 </head>
     
 <body>
     <h1>故宮南院觀眾意見回復小幫手</h1>
     <form method="POST" action="/generate_response" onsubmit="return generateResponse();">
 
-        <label for="category">請先選擇觀眾意見類別：</label>
-        <select name="category" id="category">
-            <option value="設施">設施</option>
-            <option value="展覽">展覽</option>
-            <option value="服務">服務</option>
-        </select><br><br>
+<label for="category">請先選擇觀眾意見類別：</label>
+        <div id="category">
+            <button type="button" class="category-btn" data-value="設施">設施</button>
+            <button type="button" class="category-btn" data-value="展覽">展覽</button>
+            <button type="button" class="category-btn" data-value="服務">服務</button>
+        </div>
+        <input type="hidden" name="category" id="category-input"><br><br>
+        
         <label for="feedback">請輸入觀眾意見內容：</label><br>
         <textarea name="feedback" id="feedback" rows="4" cols="50"></textarea><br><br>
         <label for="investigation">請輸入業管單位調查結果（可以留空）：</label><br>
@@ -52,6 +59,20 @@
             <option value="150">150字以內</option>
             <option value="unlimited" selected>不限（預設）</option>
         </select>
+        
+         <script>
+            // 為每個類別按鈕添加點擊事件
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // 移除所有按鈕的 selected 類
+                    document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('selected'));
+                    // 為被點擊的按鈕添加 selected 類
+                    this.classList.add('selected');
+                    // 更新隱藏的 input 欄位的值
+                    document.getElementById('category-input').value = this.getAttribute('data-value');
+                });
+            });
+        </script>
         
         <label for="style">風格:</label>
         <select id="style" name="style">
