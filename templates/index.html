@@ -4,7 +4,7 @@
 <head>
     <title>故宮南院觀眾意見回復小幫手</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-
+    
     <style>
         body,
         html,
@@ -44,7 +44,7 @@
 
 <body>
     <h1>故宮南院觀眾意見回復小幫手</h1>
-    <form method="POST" action="/generate_response" onsubmit="return generateResponse();">
+    <form id="feedbackForm">
 
         <label for="category">請先選擇意見類別：</label>
         <div id="category">
@@ -79,7 +79,7 @@
         <!-- Hidden input to store the combined value of word_count, style, and other -->
         <input type="hidden" id="additional_prompt" name="additional_prompt">
 
-        <input type="submit" value="辛苦了！請按我生成回應">
+          <input type="submit" value="辛苦了！請按我生成回應">
     </form>
     <div class="progress" style="height: 30px;">
         <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
@@ -102,8 +102,8 @@
             });
         });
 
-        function generateResponse() {
-            event.preventDefault();
+        $('#feedbackForm').submit(function (e) {
+            e.preventDefault();
 
             // Combine the values of word_count, style, and other into the additional_prompt hidden input
             let wordCount = document.getElementById("word_count").value;
@@ -111,10 +111,27 @@
             let other = document.getElementById("other").value;
             document.getElementById("additional_prompt").value = wordCount + ", " + style + ", " + other;
 
-            // ... rest of the function remains unchanged
-        }
-
-        // ... rest of the script remains unchanged
+            // Send AJAX request
+            $.ajax({
+                type: "POST",
+                url: "/generate_response",
+                data: $(this).serialize(),
+                success: function (response) {
+                    // Update the response container with the server's response
+                    $('#response-container').html(response);
+                    // Reset the progress bar
+                    $('.progress-bar').css('width', '100%').attr('aria-valuenow', 100).text('100%');
+                },
+                error: function (error) {
+                    // Handle any errors here
+                    console.error("Error:", error);
+                },
+                beforeSend: function () {
+                    // Update the progress bar to show that the request is in progress
+                    $('.progress-bar').css('width', '50%').attr('aria-valuenow', 50).text('50%');
+                }
+            });
+        });
     </script>
 </body>
 
