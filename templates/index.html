@@ -63,6 +63,18 @@
                     var responseContainer = document.getElementById("response-container");
                     responseContainer.textContent = data.chat_history[data.chat_history.length - 1].content;
                     clearInterval(interval); // 停止進度條更新
+
+                     // 停止進度條更新並設定為100%
+                    clearInterval(interval);
+                    let progressBar = $(".progress-bar");
+                    progressBar.css("width", "100%");
+                    progressBar.text("100%");
+                    
+                    // 新增「下一個案件」按鈕
+                    var nextButton = document.createElement("button");
+                    nextButton.textContent = "下一個案件";
+                    nextButton.onclick = resetForm;
+                    responseContainer.appendChild(nextButton);
                 })
                 .catch(error => {
                     console.log("There was a problem with the fetch operation:", error.message);
@@ -85,6 +97,15 @@
                 }
             }, 750); // 每750毫秒更新一次
         }
+
+        function resetForm() {
+            document.getElementById("feedback").value = "";
+            document.getElementById("investigation").value = "";
+            document.getElementById("response-container").textContent = "";
+            let progressBar = $(".progress-bar");
+            progressBar.css("width", "0%");
+            progressBar.text("0%");
+}
     </script>
 </body>
 
